@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 5000
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 
@@ -25,12 +25,23 @@ async function run() {
   try {
 
     await client.connect();
+    const toyCollection = client.db('actionHouse').collection('toys');
+
+    //Add a Toy
+    app.post('/toys', async (req, res) => {
+      const toy = req.body;
+      console.log(toy);
+      const result = toyCollection.insertOne(toy);
+      res.send(result)
+    })
+
+
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
 
-    await client.close();
+    //await client.close();
   }
 }
 run().catch(console.dir);
