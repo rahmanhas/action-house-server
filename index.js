@@ -34,6 +34,11 @@ async function run() {
       const result = toyCollection.insertOne(toy);
       res.send(result)
     })
+    app.get('/storedtoydata', async (req, res) => {
+      const cursor = toyCollection.find();
+      const result = await cursor.toArray()
+      res.send(result);
+    })
 
 
 
