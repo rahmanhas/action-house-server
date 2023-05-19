@@ -27,6 +27,7 @@ async function run() {
     // await client.connect();
     client.connect();
     const toyCollection = client.db('actionHouse').collection('toys');
+    const galleryCollection = client.db('actionHouse').collection('gallery-images');
 
     //Add a Toy
     app.post('/toys', async (req, res) => {
@@ -44,6 +45,11 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await toyCollection.findOne(query)
+      res.send(result);
+    })
+    app.get('/galleryimages', async (req, res) => {
+      const cursor = galleryCollection.find();
+      const result = await cursor.toArray()
       res.send(result);
     })
 
