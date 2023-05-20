@@ -52,14 +52,18 @@ async function run() {
     //Add a Toy
     app.post('/toys', async (req, res) => {
       const toy = req.body;
-      console.log(toy);
       const result = await toyCollection.insertOne(toy);
       res.send(result)
     })
     app.get('/storedtoydata', async (req, res) => {
-      const cursor = toyCollection.find();
-      const result = await cursor.toArray()
+      const cursor = toyCollection.find().limit(20);
+      const result = await cursor.toArray(); 
       res.send(result);
+    })
+    //Home Page shop by category sorted
+    app.get('/storedtoydata/:subCategory', async (req, res) => {
+      const result = await toyCollection.find({ subCategory: req.params.subCategory }).limit(4).toArray();
+      res.send(result)
     })
     app.get('/storedtoydata/:id', async (req, res) => {
       const id = req.params.id;
