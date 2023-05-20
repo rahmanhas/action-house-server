@@ -30,17 +30,17 @@ async function run() {
     const galleryCollection = client.db('actionHouse').collection('gallery-images');
 
     //indexing
-    const indexKeys = {toyName:1, subCategory:1};
-    const indexOptions = {name: "titleCategory"}
+    const indexKeys = { toyName: 1, subCategory: 1 };
+    const indexOptions = { name: "titleCategory" }
 
-   const result = await toyCollection.createIndex(indexKeys, indexOptions)
+    const result = await toyCollection.createIndex(indexKeys, indexOptions)
 
-    app.get("/searchbytoyname/:toyname",async(req,res)=>{
+    app.get("/searchbytoyname/:toyname", async (req, res) => {
       const searchedToyName = req.params.toyname;
 
       const result = await toyCollection.find({
-        $or:[
-          {toyName: {$regex:searchedToyName,$options:"i"}},
+        $or: [
+          { toyName: { $regex: searchedToyName, $options: "i" } },
           // {subCategory: {$regex:searchedToyName,$options:"i"}}
         ]
       }).toArray()
@@ -73,66 +73,60 @@ async function run() {
       res.send(result);
     })
     //My Toys
-    app.get('/mytoys/:email',async(req,res)=>{
-      const result = await toyCollection.find({sellerEmail: req.params.email}).toArray();
+    app.get('/mytoys/:email', async (req, res) => {
+      const result = await toyCollection.find({ sellerEmail: req.params.email }).toArray();
       res.send(result)
     })
+    //sorting ascending order
+    app.get('/ascendedtoy/:email', async (req, res) => {
+      const cursor = toyCollection.find({ sellerEmail: req.params.email });
+      const result = await cursor.toArray();
+      result.forEach((document) => {
+        document.price = parseFloat(document.price);
+      });
+      result.sort((a, b) => a.price - b.price);
+      res.send(result);
+    })
+    //sorting descending order
+    app.get('/descendedtoy/:email', async (req, res) => {
+      const cursor = toyCollection.find({ sellerEmail: req.params.email });
+      const result = await cursor.toArray();
+      result.forEach((document) => {
+        document.price = parseFloat(document.price);
+      });
+
+
+      result.sort((a, b) => b.price - a.price);
+
+      res.send(result);
+    })
+
     //Update Toy
-    app.put("/updatetoy/:id",async(req,res)=>{
+    app.put("/updatetoy/:id", async (req, res) => {
       const id = req.params.id;
-      const toy= req.body;
-      const filter = {_id: new ObjectId(id)};
-      const options = {upsert: true}
+      const toy = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true }
       const updateToy = {
-        $set:{
+        $set: {
           price: toy.price,
           availableQuantity: toy.availableQuantity,
           detailDescription: toy.detailDescription
         }
       }
-      const result = await toyCollection.updateOne(filter,updateToy,options);
+      const result = await toyCollection.updateOne(filter, updateToy, options);
       res.send(result);
 
     })
     //delete toy
-    app.delete('/deletetoy/:id',async(req,res)=>{
+    app.delete('/deletetoy/:id', async (req, res) => {
       const id = req.params.id;
-      console.log('please delete from database',id);
-      const query = {_id: new ObjectId(id) }
+      console.log('please delete from database', id);
+      const query = { _id: new ObjectId(id) }
       const result = await toyCollection.deleteOne(query);
       res.send(result)
-  })
+    })
 
-  //sorting ascending order
-  app.get('/ascendedtoy',async(req,res)=>{
-    const cursor = toyCollection.find();
-  const result = await cursor.toArray();
-
-  
-  result.forEach((document) => {
-    document.price = parseFloat(document.price);
-  });
-
-  
-  result.sort((a, b) => a.price - b.price);
-
-  res.send(result);
-  })
-  //sorting decending order
-  app.get('/decendedtoy',async(req,res)=>{
-    const cursor = toyCollection.find();
-  const result = await cursor.toArray();
-
-  
-  result.forEach((document) => {
-    document.price = parseFloat(document.price);
-  });
-
-  
-  result.sort((a, b) => b.price - a.price);
-
-  res.send(result);
-  })
 
 
     await client.db("admin").command({ ping: 1 });
