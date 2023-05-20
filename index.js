@@ -77,6 +77,22 @@ async function run() {
       const result = await toyCollection.find({sellerEmail: req.params.email}).toArray();
       res.send(result)
     })
+    //Update TOy
+    app.put("updatetoy/:id",async(req,res)=>{
+      const id = req.params.id;
+      const body= req.body;
+      const filter = {_id: new ObjectId(id)};
+      const updateToy = {
+        $set:{
+          price: body.price,
+          availableQuantity: body.availableQuantity,
+          detailDescription: body.detailDescription
+        }
+      }
+      const result = await toyCollection.updateOne(filter,updateToy);
+      res.send(result);
+
+    })
 
 
     await client.db("admin").command({ ping: 1 });
