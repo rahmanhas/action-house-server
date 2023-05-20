@@ -25,7 +25,7 @@ async function run() {
   try {
 
     // await client.connect();
-    client.connect();
+    //client.connect();
     const toyCollection = client.db('actionHouse').collection('toys');
     const galleryCollection = client.db('actionHouse').collection('gallery-images');
 
@@ -33,7 +33,7 @@ async function run() {
     const indexKeys = {toyName:1, subCategory:1};
     const indexOptions = {name: "titleCategory"}
 
-    const result = await toyCollection.createIndex(indexKeys, indexOptions)
+   const result = await toyCollection.createIndex(indexKeys, indexOptions)
 
     app.get("/searchbytoyname/:toyname",async(req,res)=>{
       const searchedToyName = req.params.toyname;
@@ -77,22 +77,31 @@ async function run() {
       const result = await toyCollection.find({sellerEmail: req.params.email}).toArray();
       res.send(result)
     })
-    //Update TOy
-    app.put("updatetoy/:id",async(req,res)=>{
+    //Update Toy
+    app.put("/updatetoy/:id",async(req,res)=>{
       const id = req.params.id;
-      const body= req.body;
+      const toy= req.body;
       const filter = {_id: new ObjectId(id)};
+      const options = {upsert: true}
       const updateToy = {
         $set:{
-          price: body.price,
-          availableQuantity: body.availableQuantity,
-          detailDescription: body.detailDescription
+          price: toy.price,
+          availableQuantity: toy.availableQuantity,
+          detailDescription: toy.detailDescription
         }
       }
-      const result = await toyCollection.updateOne(filter,updateToy);
+      const result = await toyCollection.updateOne(filter,updateToy,options);
       res.send(result);
 
     })
+    //delete toy
+    app.delete('/deletetoy/:id',async(req,res)=>{
+      const id = req.params.id;
+      console.log('please delete from database',id);
+      const query = {_id: new ObjectId(id) }
+      const result = await toyCollection.deleteOne(query);
+      res.send(result)
+  })
 
 
     await client.db("admin").command({ ping: 1 });
