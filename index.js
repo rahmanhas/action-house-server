@@ -103,6 +103,37 @@ async function run() {
       res.send(result)
   })
 
+  //sorting ascending order
+  app.get('/ascendedtoy',async(req,res)=>{
+    const cursor = toyCollection.find();
+  const result = await cursor.toArray();
+
+  
+  result.forEach((document) => {
+    document.price = parseFloat(document.price);
+  });
+
+  
+  result.sort((a, b) => a.price - b.price);
+
+  res.send(result);
+  })
+  //sorting decending order
+  app.get('/decendedtoy',async(req,res)=>{
+    const cursor = toyCollection.find();
+  const result = await cursor.toArray();
+
+  
+  result.forEach((document) => {
+    document.price = parseFloat(document.price);
+  });
+
+  
+  result.sort((a, b) => b.price - a.price);
+
+  res.send(result);
+  })
+
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
