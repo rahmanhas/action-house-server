@@ -29,6 +29,26 @@ async function run() {
     const toyCollection = client.db('actionHouse').collection('toys');
     const galleryCollection = client.db('actionHouse').collection('gallery-images');
 
+    //indexing
+    const indexKeys = {toyName:1, subCategory:1};
+    const indexOptions = {name: "titleCategory"}
+
+    const result = await toyCollection.createIndex(indexKeys, indexOptions)
+
+    app.get("/searchbytoyname/:toyname",async(req,res)=>{
+      const searchedToyName = req.params.toyname;
+
+      const result = await toyCollection.find({
+        $or:[
+          {toyName: {$regex:searchedToyName,$options:"i"}},
+          // {subCategory: {$regex:searchedToyName,$options:"i"}}
+        ]
+      }).toArray()
+      res.send(result)
+    })
+
+
+
     //Add a Toy
     app.post('/toys', async (req, res) => {
       const toy = req.body;
