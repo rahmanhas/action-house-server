@@ -27,32 +27,12 @@ async function run() {
     const toyCollection = client.db('actionHouse').collection('toys');
     const galleryCollection = client.db('actionHouse').collection('gallery-images');
 
-    //indexing
-    //const indexKeys = { toyName: 1, subCategory: 1 };
-    //const indexOptions = { name: "titleCategory" }
-
-    //const result = await toyCollection.createIndex(indexKeys, indexOptions)
-
-    // app.get("/searchbytoyname/:toyname", async (req, res) => {
-    //   const searchedToyName = req.params.toyname;
-
-    //   const result = await toyCollection.find({
-    //     $or: [
-    //       { toyName: { $regex: searchedToyName, $options: "i" } },
-    //       // {subCategory: {$regex:searchedToyName,$options:"i"}}
-    //     ]
-    //   }).toArray()
-    //   res.send(result)
-    // }){ $regex: req.params.searchedToyName, $options: "i" }
-    //{ toyName: { $regex: searchedToyName, $options: "i" } }
     app.get("/searchbytoyname/:toyname", async (req, res) => {
       const searchedToyName = req.params.toyname;
 
       const result = await toyCollection.find({ toyName: { $regex: searchedToyName, $options: "i" } }).toArray()
       res.send(result)
     })
-
-
 
     //Add a Toy
     app.post('/toys', async (req, res) => {
@@ -103,13 +83,9 @@ async function run() {
       result.forEach((document) => {
         document.price = parseFloat(document.price);
       });
-
-
       result.sort((a, b) => b.price - a.price);
-
       res.send(result);
     })
-
     //Update Toy
     app.put("/updatetoy/:id", async (req, res) => {
       const id = req.params.id;
@@ -125,7 +101,6 @@ async function run() {
       }
       const result = await toyCollection.updateOne(filter, updateToy, options);
       res.send(result);
-
     })
     //delete toy
     app.delete('/deletetoy/:id', async (req, res) => {
@@ -135,13 +110,9 @@ async function run() {
       const result = await toyCollection.deleteOne(query);
       res.send(result)
     })
-
-
-
     //await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
-
     //await client.close();
   }
 }
@@ -150,7 +121,6 @@ run().catch(console.dir);
 app.get('/', (req, res) => {
   res.send('action-house-server is working...')
 })
-
 
 app.listen(port, () => {
   console.log(`action-house-server listening on port ${port}`)
